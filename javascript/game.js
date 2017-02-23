@@ -2,22 +2,24 @@
  * Created by prima on 2/20/2017.
  */
 
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'game-canvas', { preload: preload, create: create, update: update, render: render });
+var game = new Phaser.Game(800, 500, Phaser.CANVAS, 'game-canvas', { preload: preload, create: create, update: update, render: render });
 
 function preload() {
 
     game.load.crossOrigin = 'anonymous';
     game.load.spritesheet('person', 'sprites/white.jpg', 222, 222);
+    game.load.spritesheet('button', 'sprites/button.png', 278, 95);
+    game.load.spritesheet('k12school', 'sprites/school.png', 386, 239);
 
 }
 
 var educatedPersonsGroup;
 var unEducatedPersonsGroup;
+var schoolsGroup;
 var gridScale;
-var educatedPersonsArray;
-var unEducatedPersonsArray;
 var text;
 var canProCreate;
+var createSchoolButton;
 
 function create() {
     var numOfEducatedPersons = 10;
@@ -26,33 +28,36 @@ function create() {
     var rows= 100;
     educatedPersonsGroup = game.add.physicsGroup(Phaser.Physics.ARCADE);
     unEducatedPersonsGroup = game.add.physicsGroup(Phaser.Physics.ARCADE);
+    schoolsGroup = game.add.physicsGroup(Phaser.Physics.ARCADE);
     educatedPersonsGroup.inputEnableChildren = true;
     unEducatedPersonsGroup.inputEnableChildren = true;
     //game.add.sprite(0, 0, game.create.grid('grid', gridScale * rows, gridScale * rows, gridScale, gridScale, 'rgba(0, 250, 0, 1)'));
     createEducatedPersons(educatedPersonsGroup, numOfEducatedPersons);
     createUneducatedPersons(unEducatedPersonsGroup, numOfUnEducatedPersons);
+    game.time.events.loop(Phaser.Timer.SECOND * 30, increaseAge, this);
+    createSchoolButton = game.add.button(game.world.width - (game.world.centerX/2.5), 10, 'button', createSchool, this, .5, .5, 0);
+    createSchoolButton.setScaleMinMax(.5, .5);
 
     function createUneducatedPersons(unEducatedPersonsGroup,numOfUnEducatedPersons){
-        unEducatedPersonsArray = [];
         var person;
         for(var i=0; i<= numOfUnEducatedPersons; i++){
             person = unEducatedPersonsGroup.create(Math.floor(getRandom(1,rows))*gridScale, Math.floor(getRandom(1,rows))*gridScale, 'person');
-            var employed = Math.floor(getRandom(0,2));
-            var income, education, happiness;
-            if(employed == 1){
+            var employed = Math.floor(getRandom(0,3));
+            var income, education, happiness, age;
+            if(employed >= 1){
                 employed = true;
                 education = 2;
                 happiness = 1;
                 income = getUnEducatedIncome();
             } else {
-                employed = false
+                employed = false;
                 happiness = 0;
                 education = 1;
                 income = 0;
             }
-            unEducatedPersonsArray.push(new Person(education,happiness,employed,income));
+            age = getRandomAdultAge();
+            person.personProps = new Person(education,happiness,employed,income, age);
             setPersonAttributes(person, false, education);
-            person.childNum = i;
             unEducatedPersonsGroup.add(person);
         }
         unEducatedPersonsGroup.setAll('body.collideWorldBounds', true);
@@ -62,13 +67,12 @@ function create() {
     }
 
     function createEducatedPersons(educatedPersonsGroup, numOfEducatedPersons) {
-        educatedPersonsArray = [];
         var person;
         for(var i=0; i<= numOfEducatedPersons; i++){
             person = educatedPersonsGroup.create(Math.floor(getRandom(1,rows))*gridScale, Math.floor(getRandom(1,rows))*gridScale, 'person');
-            educatedPersonsArray.push(new Person(5,3,true,getEducatedIncome()));
+            var age = getRandomAdultAge();
+            person.personProps = new Person(5,3,true,getEducatedIncome(), age);
             setPersonAttributes(person, true, 5);
-            person.childNum = i;
             educatedPersonsGroup.add(person);
         }
         educatedPersonsGroup.setAll('body.collideWorldBounds', true);
@@ -79,15 +83,45 @@ function create() {
 
     }
 
+    function increaseAge(){
+        game.world.forEach(function(item) {
+            item.children.forEach(function(child){
+                child.personProps.age++;
+            });
+
+        });
+
+    }
+
 
 
 }
 
-function Person(education, happiness, employed, income) {
+function createSchool(){
+    console.log("school created");
+    var school = game.add.sprite(game.world.centerX, game.world.centerY, 'k12school');
+    game.physics.arcade.enable(school);
+    school.body.immovable = true;
+    school.setScaleMinMax(.25, .25);
+    var style = { font: "20px Courier", fill: "#00ff44" };
+    var text = game.add.text(20, 40, "Drag School to Desired Location", style);
+
+    school.inputEnabled = true;
+    school.input.enableDrag();
+    setTimeout(function(){
+        school.inputEnabled = false;
+        schoolsGroup.add(school);
+        text.destroy();
+    }, 5000);
+
+}
+
+function Person(education, happiness, employed, income, age) {
     this.education = education;
     this.happiness = happiness;
     this.employed = employed;
     this.income = income;
+    this.age = age;
     //this.taxes = taxes;
 }
 
@@ -99,25 +133,19 @@ function setPersonAttributes(person, educated, education) {
         person.setScaleMinMax(.05, .05);
         person.body.setSize(12, 12, 0, 0);
         person.type = "educated";
-        person.body.velocity.set(gridScale/2);
+        person.body.velocity.set(gridScale);
     } else {
         person.tint = education * 0xDC143C;
         person.type = "uneducated";
-        person.body.velocity.set(gridScale/10); //might not move at all
+        person.body.velocity.set(gridScale/3); //might not move at all
     }
 }
 
 function onOver (sprite) {
-
-    var childNum = sprite.childNum;
     var childInfo;
-    if(sprite.type === "educated"){
-        childInfo = educatedPersonsArray[childNum];
-    }else {
-        childInfo = unEducatedPersonsArray[childNum];
-    }
+    childInfo = sprite.personProps;
 
-    text = "Education = " + childInfo.education + "| Happiness = " + childInfo.happiness + "| Employed = " + childInfo.employed + "| Income = " + childInfo.income ;
+    text = "Education: " + childInfo.education + "| Happiness: " + childInfo.happiness + "| Employed: " + childInfo.employed + "| $" + childInfo.income + "| Age: " + childInfo.age;
 
 }
 
@@ -126,28 +154,19 @@ function getRandom(min, max) {
 
 }
 
+function getRandomAdultAge() {
+    return Math.floor(Math.random() * (30 - 16) + 16);
 
-function transformToEducated(index, _uneducated){
-    unEducatedPersonsArray[index].income = getEducatedIncome();
-    unEducatedPersonsArray[index].employed = true;
-    unEducatedPersonsArray[index].happiness++;
+}
+
+function transformToEducated(_uneducated){
+    _uneducated.personProps.income = getEducatedIncome();
+    _uneducated.personProps.employed = true;
+    _uneducated.personProps.happiness++;
     setPersonAttributes(_uneducated, true, 5);
     educatedPersonsGroup.add(_uneducated);
     unEducatedPersonsGroup.remove(_uneducated);
-    educatedPersonsArray.push(unEducatedPersonsArray[index]);
-    unEducatedPersonsArray.splice(index, 1);
-    unEducatedPersonsGroup.iterate('key', 'uneducated', Phaser.Group.RETURN_NONE, updateUneducatedChildNums(), this);
-    _uneducated.childNum = educatedPersonsArray.length -1;
     console.log("transformedToEducated", _uneducated);
-}
-
-function updateUneducatedChildNums(){
-    console.log(this);
-    for(var i = 0; i < unEducatedPersonsArray.length; i++){
-        if(this == unEducatedPersonsGroup.children[i]){
-            this.childNum = i;
-        }
-    }
 }
 
 function getEducatedIncome(){
@@ -155,23 +174,25 @@ function getEducatedIncome(){
 }
 
 function getUnEducatedIncome(){
-    return Math.floor(getRandom(10000,25000));
+    return Math.floor(getRandom(15000,30000));
 }
 
 
 function diffEducationCollissionHandler(_uneducated, _educated){
-    var uneducatedIndex = _uneducated.childNum;
-    unEducatedPersonsArray[uneducatedIndex].education++;
-    if(unEducatedPersonsArray[uneducatedIndex].education >= 5){
-        transformToEducated(uneducatedIndex, _uneducated);
+    _uneducated.personProps.numOfEducatedColliders++;
+    if(_uneducated.personProps.numOfEducatedColliders >= 10){
+        _uneducated.personProps.education++;
+        _uneducated.personProps.numOfEducatedColliders = 0;
+        if(_uneducated.personProps.education >=5) {
+            transformToEducated( _uneducated);
+        }
     }
-    var educatedIndex = _educated.childNum;
-    if(educatedPersonsArray[educatedIndex].happiness > 0){
-        educatedPersonsArray[educatedIndex].happiness--;
+    if(_educated.personProps.happiness > 0){
+        _educated.personProps.happiness--;
     }
-    if((educatedPersonsArray[educatedIndex].education - unEducatedPersonsArray[uneducatedIndex].education) <= 2){
-        if(educatedPersonsArray[educatedIndex].happiness >= 2){
-            if(unEducatedPersonsArray[uneducatedIndex].happiness >= 2){
+    if((_educated.personProps.education - _uneducated.personProps.education) <= 2){
+        if(_educated.personProps.happiness >= 2){
+            if(_uneducated.personProps.happiness >= 2){
 
                         proCreate(_educated, _uneducated, true);
 
@@ -196,11 +217,11 @@ function uneducatedCollissionHandler(_sprite1, _sprite2){
 function proCreate(sprite1, sprite2, different, educated) {
     setTimeout(function(){
         canProCreate = true;
-    }, 5000);
+    }, 1000);
     if(canProCreate ) {
-        var education, income, happiness, employed, person;
+        var education, income, happiness, employed, person,  age;
         if (different) {
-            education = educatedPersonsArray[sprite1.childNum].education - unEducatedPersonsArray[sprite2.childNum].education;
+            education = sprite1.personProps.education - sprite2.personProps.education;
             if (education >= 5) {
                 educated = true;
             } else {
@@ -208,39 +229,63 @@ function proCreate(sprite1, sprite2, different, educated) {
             }
         }
         if (educated) {
-            if((educatedPersonsArray[sprite1.childNum].income + educatedPersonsArray[sprite2.childNum].income) >= 200000){
+            if(educatedWillProCreate(sprite1, sprite2)){
                 education = 5;
                 income = getEducatedIncome();
                 happiness = 3;
                 employed = true;
+                age = 1;
                 person = educatedPersonsGroup.create(sprite1.position.x, sprite2.position.y, 'person');
                 setPersonAttributes(person, true, education);
-                educatedPersonsArray.push(new Person(education, happiness, employed, income));
-                person.childNum = educatedPersonsArray.length - 1;
+                person.personProps = new Person(education, happiness, employed, income, age);
                 console.log("new EDUCATED person created?");
             }
         } else {
-            employed = Math.floor(getRandom(0, 2));
-            if (employed == 1) {
-                employed = true;
-                education = 2;
-                happiness = 1;
-                income = getUnEducatedIncome();
-            } else {
-                employed = false;
-                happiness = 0;
-                education = 1;
-                income = 0;
+            if(unEducatedWillProCreate(sprite1, sprite2)){
+                employed = Math.floor(getRandom(0, 2));
+                age = 1;
+                if (employed == 1) {
+                    employed = true;
+                    education = 2;
+                    happiness = 1;
+                    income = getUnEducatedIncome();
+                } else {
+                    employed = false;
+                    happiness = 0;
+                    education = 1;
+                    income = 0;
+                }
+                person = unEducatedPersonsGroup.create(sprite1.position.x, sprite2.position.y, 'person');
+                setPersonAttributes(person, false, education);
+                person.personProps = new Person(education, happiness, employed, income);
+                console.log("new UNEDUCATED person created?");
             }
-            person = unEducatedPersonsGroup.create(sprite1.position.x, sprite2.position.y, 'person');
-            setPersonAttributes(person, false, education);
-            unEducatedPersonsArray.push(new Person(education, happiness, employed, income));
-            person.childNum = unEducatedPersonsArray.length - 1;
-            console.log("new UNEDUCATED person created?");
         }
         canProCreate = false;
     }
 
+}
+
+function educatedWillProCreate(sprite1, sprite2) {
+    if(sprite1.personProps.age > 30 && sprite2.personProps.age > 30){
+        if(sprite1.personProps.age < 45 && sprite2.personProps.age < 45) {
+            if(sprite1.personProps.income + sprite2.personProps.income >= 200000){
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+function unEducatedWillProCreate(sprite1, sprite2) {
+    if(sprite1.personProps.age > 16 && sprite2.personProps.age > 16){
+        if(sprite1.personProps.age < 40 && sprite2.personProps.age < 40) {
+            if(sprite1.personProps.income + sprite2.personProps.income >= 30000){
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 function update() {
@@ -251,7 +296,7 @@ function update() {
 }
 
 function render() {
-    game.debug.text(text, 32, 32);
+    game.debug.text(text, 20, 20);
 }
 
 // function move() {
