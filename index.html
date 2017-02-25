@@ -6,7 +6,7 @@
     <script src="javascript/phaser.min.js"></script>
     <script src="javascript/game.js"></script>
     <style>
-        #popup {
+        .popup {
             background-color: white;
             width: 250px;
             height: 250px;
@@ -14,7 +14,7 @@
             position: absolute;
             right: 40%;
             top: 150px;
-            border: 2px solid darkred;
+            text-align: center;
         }
 
         h1 {
@@ -78,23 +78,40 @@
 
         button {
             margin-bottom:10px;
+
         }
     </style>
 </head>
 <body>
 
 <div id="game-canvas">
-</div>
-
-<div id="popup" class="hidden">
-    <h1>Student Roster<span class="dismiss" onclick="dismissPopup()">x</span></h1>
-    <div class="list-container">
-        <h2>Double click student to add to roster</h2>
-        <ul id="enrolled-student-list">
+    <div id="popup-student-roster" class="popup hidden">
+        <h1>Student Roster<span class="dismiss" onclick="dismissStudentPopup()">x</span></h1>
+        <div class="list-container">
+            <h2>Double click student to add to roster</h2>
+            <ul id="enrolled-student-list">
+            </ul>
+        </div>
     </div>
 
-    </ul>
+    <div id="popup-create-school" class="popup hidden">
+        <h1>Create School<span class="dismiss" onclick="dismissCreatePopup()">x</span></h1>
+        <div class="list-container">
+            <h2>Public K-12</h2>
+            <button onclick="createSchool('k12')">CREATE</button>
+            <h2>Private K-12</h2>
+            <button onclick="createSchool('privatek12')">CREATE</button>
+            <h2>Trade School</h2>
+            <button onclick="createSchool('trade')">CREATE</button>
+            <h2>Community College</h2>
+            <button onclick="createSchool('community')">CREATE</button>
+            <h2>University</h2>
+            <button onclick="createSchool('uni')">CREATE</button>
+        </div>
+    </div>
 </div>
+
+
 
 </body>
 </html>

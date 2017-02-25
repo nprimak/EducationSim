@@ -9,7 +9,11 @@ function preload() {
     game.load.crossOrigin = 'anonymous';
     game.load.spritesheet('person', 'sprites/white.jpg', 222, 222);
     game.load.spritesheet('button', 'sprites/button.png', 278, 95);
-    game.load.spritesheet('k12school', 'sprites/school.png', 386, 239);
+    game.load.spritesheet('k12', 'sprites/school.png', 386, 239);
+    game.load.spritesheet('community', 'sprites/community.png', 385, 239);
+    game.load.spritesheet('privatek12', 'sprites/privateschool.png', 385, 239);
+    game.load.spritesheet('trade', 'sprites/tradeschool.png', 385, 239);
+    game.load.spritesheet('uni', 'sprites/university.png', 385, 239);
     game.load.spritesheet('person0', 'sprites/person_0.png', 60, 130);
     game.load.spritesheet('person1', 'sprites/person_1.png', 60, 130);
     game.load.spritesheet('person2', 'sprites/person_2.png', 60, 130);
@@ -39,7 +43,7 @@ var topTextArea;
 var schoolCoordinates = [];
 var money = 500000;
 var school;
-var popupExists = false;
+var schoolPopupExists = false;
 
 function create() {
 
@@ -64,7 +68,7 @@ function create() {
     createUneducatedPersons(unEducatedPersonsGroup, numOfUnEducatedPersons);
     game.time.events.loop(Phaser.Timer.SECOND*12, increaseAge, this);
     game.time.events.loop(Phaser.Timer.SECOND, updateMoney, this);
-    createSchoolButton = game.add.button(game.world.width - (game.world.centerX/2.5), 10, 'button', createSchool, this, .5, .5, 0);
+    createSchoolButton = game.add.button(game.world.width - (game.world.centerX/2.5), 10, 'button', displaySchoolPopup, this, .5, .5, 0);
     createSchoolButton.setScaleMinMax(.5, .5);
 
     function createUneducatedPersons(unEducatedPersonsGroup,numOfUnEducatedPersons){
@@ -112,6 +116,32 @@ function create() {
 
     }
 
+    function createButtonAreas() {
+        // create a new bitmap data object
+        var bmd = game.add.bitmapData(800,50);
+
+        // draw to the canvas context like normal
+        bmd.ctx.beginPath();
+        bmd.ctx.rect(0,0,800,50);
+        bmd.ctx.fillStyle = '#8b0000';
+        bmd.ctx.fill();
+        bottomTextArea = game.add.sprite(0, 450, bmd);
+        game.physics.enable(bottomTextArea, Phaser.Physics.ARCADE);
+        bottomTextArea.body.immovable = true;
+
+        // create a new bitmap data object
+        var bmd2 = game.add.bitmapData(800,80);
+
+        // draw to the canvas context like normal
+        bmd2.ctx.beginPath();
+        bmd2.ctx.rect(0,0,800,80);
+        bmd2.ctx.fillStyle = '#8b0000';
+        bmd2.ctx.fill();
+        topTextArea = game.add.sprite(0, 0, bmd2);
+        game.physics.enable(topTextArea, Phaser.Physics.ARCADE);
+        topTextArea.body.immovable = true;
+    }
+
     function increaseAge(){
         game.world.forEach(function(item) {
             item.children.forEach(function(child){
@@ -152,36 +182,8 @@ function create() {
 
     }
 
-
-
-
 }
 
-function createButtonAreas() {
-    // create a new bitmap data object
-    var bmd = game.add.bitmapData(800,50);
-
-    // draw to the canvas context like normal
-    bmd.ctx.beginPath();
-    bmd.ctx.rect(0,0,800,50);
-    bmd.ctx.fillStyle = '#8b0000';
-    bmd.ctx.fill();
-    bottomTextArea = game.add.sprite(0, 450, bmd);
-    game.physics.enable(bottomTextArea, Phaser.Physics.ARCADE);
-    bottomTextArea.body.immovable = true;
-
-    // create a new bitmap data object
-    var bmd2 = game.add.bitmapData(800,80);
-
-    // draw to the canvas context like normal
-    bmd2.ctx.beginPath();
-    bmd2.ctx.rect(0,0,800,80);
-    bmd2.ctx.fillStyle = '#8b0000';
-    bmd2.ctx.fill();
-    topTextArea = game.add.sprite(0, 0, bmd2);
-    game.physics.enable(topTextArea, Phaser.Physics.ARCADE);
-    topTextArea.body.immovable = true;
-}
 
 function updateMoney(){
     game.world.forEach(function(item) {
@@ -201,22 +203,23 @@ function getRandomPersonNum(){
     return Math.floor(getRandom(0,10));
 }
 
-function createSchool(){
+function createSchool(type){
         money = money - 500000;
         numOfSchools = numOfSchools + 1;
         createSchoolButton.inputEnabled = true;
-        school = game.add.sprite(game.world.centerX, game.world.centerY, 'k12');
+        school = game.add.sprite(game.world.centerX, game.world.centerY, type);
         game.physics.arcade.enable(school);
         school.body.immovable = true;
         school.setScaleMinMax(.25, .25);
         var style = {font: "20px Courier", fill: "#00ff44"};
         var text = game.add.text(20, 40, "Drag School to Desired Location", style);
-        school.quality = 1;
         school.body.setSize(95, 40, 0, 25);
         school.maximumCapacity = 10;
+        school.schoolProperties = new School(type);
         school.currentlyEnrolled = 0;
         school.roster = [];
         school.inputEnabled = true;
+        dismissCreatePopup();
         school.input.enableDrag();
         setTimeout(function () {
             school.input.disableDrag();
@@ -231,13 +234,56 @@ function createSchool(){
 
 }
 
-function onSchoolDown(school){
-    var popupElement = document.getElementById("popup");
-    clickedSchool =  school;
-    popupExists = true;
+function School(type) {
+    if(type == 'k12'){
+        this.cost = 0;
+        this.ageRange = [6,18];
+        this.quality = 1;
+        this.maxEducation = 18 * this.quality;
+        this.minEducation = 0;
+    }
+    if(type == 'privatek12'){
+        this.cost = 10000;
+        this.ageRange = [6,18];
+        this.quality = 2;
+        this.maxEducation = 18 * this.quality;
+        this.minEducation = 0;
+    }
+    if(type == 'uni'){
+        this.cost = 50000;
+        this.ageRange = [18,40];
+        this.quality = 2;
+        this.maxEducation = 21 * this.quality;
+        this.minEducation = 18;
+    }
+    if(type == 'trade'){
+        this.cost = 1000;
+        this.ageRange = [18,30];
+        this.quality = 2;
+        this.maxEducation = 18 * this.quality;
+        this.minEducation = 0;
+    }
+    if(type == 'community'){
+        this.cost = 10000;
+        this.ageRange = [18,60];
+        this.quality = 2;
+        this.maxEducation = 21 * this.quality;
+    }
+}
 
-    popupElement.className = popupElement.className.replace('hidden',' ');
+function onSchoolDown(school) {
+    var popupElement = document.getElementById("popup-student-roster");
+    clickedSchool = school;
+    schoolPopupExists = true;
+
+    popupElement.className = popupElement.className.replace('hidden', ' ');
     updateRosterList();
+
+}
+
+function displaySchoolPopup(){
+    var popupElement = document.getElementById("popup-create-school");
+    popupElement.className = popupElement.className.replace('hidden', ' ');
 }
 
 function updateRosterList() {
@@ -246,7 +292,7 @@ function updateRosterList() {
         listParent.removeChild(listParent.firstChild);
     }
     var node;
-    for(var i = 0; i < school.roster.length; i++){
+    for(var i = 0; i < clickedSchool.roster.length; i++){
         node = document.createElement("LI");
         var textnode = document.createTextNode("Student #" + i + " Education Level: " + school.roster[i].personProps.education.toString());
         node.appendChild(textnode);
@@ -257,10 +303,14 @@ function updateRosterList() {
 function enrollStudent(student) {
     if(clickedSchool.currentlyEnrolled < clickedSchool.maximumCapacity ){
         if(!student.personProps.enrolled){
-            clickedSchool.currentlyEnrolled++;
-            clickedSchool.roster.push(student);
-            student.personProps.enrolled = true;
-            updateRosterList();
+            if(canEnroll(student, clickedSchool)){
+                clickedSchool.currentlyEnrolled++;
+                clickedSchool.roster.push(student);
+                student.personProps.enrolled = true;
+                updateRosterList();
+            } else {
+                text = "Student does not have funds or is too young/old to enroll";
+            }
         } else {
             text = "Student is already enrolled.";
         }
@@ -268,6 +318,17 @@ function enrollStudent(student) {
         text = "School is already at maximum capacity";
     }
 
+}
+
+function canEnroll(student, school) {
+    if(student.personProps.age >= school.schoolProperties.ageRange[0] && student.personProps.age <= school.schoolProperties.ageRange[1]){
+        if(student.personProps.income/2 >= school.schoolProperties.cost){
+            if(student.personProps.education >= school.schoolProperties.minEducation && student.personProps.education < school.schoolProperties.maxEducation){
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 function removeEnrolledStudent(student) {
@@ -287,11 +348,17 @@ function removeEnrolledStudent(student) {
 
 }
 
-function dismissPopup(){
-    popupExists = false;
-    var popupElement = document.getElementById("popup");
+function dismissStudentPopup(){
+    schoolPopupExists = false;
+    var popupElement = document.getElementById("popup-student-roster");
     var listParent = document.getElementById("enrolled-student-list");
-    popupElement.className = 'hidden';
+    popupElement.className = 'popup hidden';
+
+}
+
+function dismissCreatePopup(){
+    var popupElement = document.getElementById("popup-create-school");;
+    popupElement.className = 'popup hidden';
 
 }
 
@@ -362,6 +429,7 @@ function checkOverlap() {
         });
     });
 }
+
 
 function onOver (sprite) {
     var childInfo;
@@ -518,7 +586,7 @@ function update() {
     } else {
         createSchoolButton.inputEnabled = false;
     }
-    if(popupExists){
+    if(schoolPopupExists){
         educatedPersonsGroup.onChildInputDown.add(enrollStudent, this);
         unEducatedPersonsGroup.onChildInputDown.add(enrollStudent, this);
     };
@@ -529,10 +597,6 @@ function update() {
 function render() {
     game.debug.text(text, 20, 475);
     game.debug.text(text2, 20, 20);
-    game.debug.body(person);
-    if(school){
-        game.debug.body(school);
-    }
 }
 
 // function move() {
