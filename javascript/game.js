@@ -27,6 +27,8 @@ function preload() {
 
 }
 
+
+
 var educatedPersonsGroup;
 var unEducatedPersonsGroup;
 var schoolsGroup;
@@ -47,13 +49,14 @@ var minimumEducatedSalary = 50000;
 var minimumNumForEducatedPerson = 12;
 var schoolPopupExists = false;
 var maintenanceFees = 0;
-var taxes = 0;
+var taxes = 0
+var prosperityBar;
 
 function create() {
 
     game.stage.backgroundColor = '#397152';
     text = "Hover over a person to see their stats";
-    text2 = "Taxpayer Money: ";
+    text2 = "$: ";
 
     // Person generation
     var numOfEducatedPersons = 10;
@@ -67,12 +70,13 @@ function create() {
     schoolsGroup = game.add.physicsGroup(Phaser.Physics.ARCADE);
     educatedPersonsGroup.inputEnableChildren = true;
     unEducatedPersonsGroup.inputEnableChildren = true;
+    prosperityBar = document.getElementById("prosperity-bar-filler");
     createButtonAreas();
     createEducatedPersons(educatedPersonsGroup, numOfEducatedPersons);
     createUneducatedPersons(unEducatedPersonsGroup, numOfUnEducatedPersons);
     game.time.events.loop(Phaser.Timer.SECOND*12, yearPasses, this);
     game.time.events.loop(Phaser.Timer.SECOND, monthPasses, this);
-    createSchoolButton = game.add.button(game.world.width - (game.world.centerX/2.5), 10, 'button', displaySchoolPopup, this, .5, .5, 0);
+    createSchoolButton = game.add.button(game.world.width - (game.world.centerX/2.7), 8, 'button', displaySchoolPopup, this, .5, .5, 0);
     createSchoolButton.setScaleMinMax(.5, .5);
 
     function createUneducatedPersons(unEducatedPersonsGroup,numOfUnEducatedPersons){
@@ -129,7 +133,7 @@ function create() {
 
         // draw to the canvas context like normal
         bmd2.ctx.beginPath();
-        bmd2.ctx.rect(0,0,800,80);
+        bmd2.ctx.rect(0,0,800,65);
         bmd2.ctx.fillStyle = '#8b0000';
         bmd2.ctx.fill();
         topTextArea = game.add.sprite(0, 0, bmd2);
@@ -231,7 +235,7 @@ function updateMoney(){
     });
         money = Math.floor(money - maintenanceFees);
 
-    text2 = "Taxpayer Money: " + Math.floor(money);
+    text2 = "$" + Math.floor(money);
 }
 
 function adjustHappiness(child){
@@ -242,7 +246,7 @@ function adjustHappiness(child){
                 child.personProps.happiness--;
             }
         }
-        if(child.personProps.enrolled){
+        if(child.personProps.enrolled && child.personProps.happiness < 100){
             child.personProps.happiness++;
         }
         if(child.personProps.happiness <= 0){
@@ -264,12 +268,12 @@ function getRandomPersonNum(){
 function createSchool(type){
         numOfSchools = numOfSchools + 1;
         createSchoolButton.inputEnabled = true;
-        var school = game.add.sprite(game.world.centerX, game.world.centerY, type);
+        var school = game.add.sprite(game.world.centerX-50, game.world.centerY-50, type);
         game.physics.arcade.enable(school);
         school.body.immovable = true;
         school.setScaleMinMax(.25, .25);
         var style = {font: "20px Courier", fill: "#00ff44"};
-        var text = game.add.text(20, 40, "Drag School to Desired Location", style);
+        var text = game.add.text(game.world.centerX -180, game.world.centerY-100, "Drag School to Desired Location", style);
         school.body.setSize(95, 40, 0, 25);
         school.maximumCapacity = 20;
         school.schoolProperties = new School(type);
@@ -423,7 +427,7 @@ function dismissStudentPopup(){
 }
 
 function dismissCreatePopup(){
-    var popupElement = document.getElementById("popup-create-school");;
+    var popupElement = document.getElementById("popup-create-school");
     popupElement.className = 'popup hidden';
 
 }
@@ -555,29 +559,37 @@ function proCreate(sprite1, sprite2, different, educated) {
         }
         if (educated) {
             if(educatedWillProCreate(sprite1, sprite2)){
-                education = 3;
+                education = 5;
                 income = Math.floor((sprite1.personProps.income + sprite2.personProps.income) * .2 );
                 happiness = 3;
                 employed = false;
-                sprite1.personProps.happiness = sprite1.personProps.happiness + 5;
-                sprite2.personProps.happiness = sprite2.personProps.happiness + 5;
-                person = educatedPersonsGroup.create(sprite1.position.x, sprite2.position.y, 'person' + randomPersonNum);
-                setPersonAttributes(person, true, education);
+                if(sprite1.personProps.happiness < 100){
+                    sprite1.personProps.happiness++;
+                }
+                if(sprite2.personProps.happiness < 100){
+                    sprite2.personProps.happiness++;
+                }
+                person = unEducatedPersonsGroup.create(sprite1.position.x, sprite2.position.y, 'person' + randomPersonNum);
+                setPersonAttributes(person, false, education);
                 person.personProps = new Person(education, happiness, employed, income, age, enrolled);
-                console.log("new EDUCATED person created?");
+                console.log("new child of EDUCATED person created?");
             }
         } else {
             if(unEducatedWillProCreate(sprite1, sprite2)){
                     employed = false;
-                    happiness = 0;
-                    education = 1;
+                    happiness = 50;
+                    education = 0;
                     income = 0;
-                sprite1.personProps.happiness = sprite1.personProps.happiness + 10;
-                sprite2.personProps.happiness = sprite2.personProps.happiness + 10;
+                if(sprite1.personProps.happiness < 100) {
+                    sprite1.personProps.happiness++;
+                }
+                if(sprite2.personProps.happiness < 100){
+                    sprite2.personProps.happiness++;
+                }
                 person = unEducatedPersonsGroup.create(sprite1.position.x, sprite2.position.y, 'person' + randomPersonNum);
                 setPersonAttributes(person, false, education);
                 person.personProps = new Person(education, happiness, employed, income, age, enrolled);
-                console.log("new UNEDUCATED person created?");
+                console.log("new child of UNEDUCATED person created?");
             }
         }
         canProCreate = false;
@@ -600,13 +612,57 @@ function unEducatedWillProCreate(sprite1, sprite2) {
     if(sprite1.personProps.age > 16 && sprite2.personProps.age > 16){
         if(sprite1.personProps.age < 40 && sprite2.personProps.age < 40){
             if(sprite1.personProps.happiness >= 25 && sprite2.personProps.happiness >= 25) {
-                return true;
+                var willProCreate = Math.floor(getRandom(1,5));
+                if(willProCreate === 1){
+                    return true;
+                } else {
+                    return false;
+                }
             }
 
         }
     }
     return false;
 }
+
+//deciding prosperity
+// one quarter is % employed
+// one quarter is overall education % (100% is education level 63)
+// one quarter is happiness
+// one quarter is income (100% for income is 200K)
+
+function calculateProsperity(){
+    var numEmployed = 0, numFullyEducated = 0, numFullyHappy = 0, num100Income = 0;
+    game.world.forEach(function(item) {
+        item.children.forEach(function (child) {
+            if(child.personProps) {
+                if (child.personProps.employed) {
+                    numEmployed++;
+                }
+                if (child.personProps.education >= 50){
+                    numFullyEducated++;
+                }
+                if(child.personProps.happiness >= 100){
+                    numFullyHappy++;
+                }
+                if(child.personProps.income >= 100000){
+                    num100Income++;
+                }
+            }
+        });
+    });
+    var numOfPeople = educatedPersonsGroup.length + unEducatedPersonsGroup.length;
+    var percentEmployed = numEmployed/numOfPeople;
+    var percentFullyEducated = numFullyEducated/numOfPeople;
+    var percentFullyHappy = numFullyHappy/numOfPeople;
+    var percent100Income = num100Income/numOfPeople;
+    var prosperityScore = Math.floor((percentEmployed + percentFullyEducated + percentFullyHappy + percent100Income) * 10);
+    prosperityBar.style.width = prosperityScore + '%';
+    if(prosperityScore < 10){
+        prosperityBar.style.backgroundColor = '#dc143c';
+    }
+    return prosperityScore;
+};
 
 function update() {
     game.physics.arcade.collide(unEducatedPersonsGroup, educatedPersonsGroup, diffEducationCollissionHandler, null, this);
@@ -633,8 +689,10 @@ function update() {
 }
 
 function render() {
+    var text3 = "Prosperity: " + calculateProsperity() + "%";
     game.debug.text(text, 20, 475);
     game.debug.text(text2, 20, 20);
+    game.debug.text(text3, 190, 20);
 }
 
 // function move() {

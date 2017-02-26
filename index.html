@@ -31,7 +31,21 @@
             text-align: center;
         }
         #tax {
-            width: 80px;
+            width: 40px;
+        }
+        #prosperity-bar {
+            width:200px;
+            background-color: black;
+            border: 1px solid darkgreen;
+            position: absolute;
+            display:block;
+            height: 20px;
+            top:40px;
+            left: 200px;
+        }
+        #prosperity-bar-filler {
+            background-color: lawngreen;
+            height:100%;
         }
 
         h1 {
@@ -102,9 +116,14 @@
 <body>
 
 <div id="game-canvas">
+
+    <div id="prosperity-bar">
+        <div id="prosperity-bar-filler"></div>
+    </div>
+
     <div id="tax-container">
-        <label class="tax-label">Tax Percent</label>
-        <input type="number" id="tax" value="20"/>
+        <label class="tax-label">Tax
+        <input type="number" id="tax" value="20"/>&nbsp;%</label>
     </div>
 
     <div id="popup-student-roster" class="popup hidden">
