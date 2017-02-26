@@ -6,15 +6,32 @@
     <script src="javascript/phaser.min.js"></script>
     <script src="javascript/game.js"></script>
     <style>
+        #tax-container {
+            position:absolute;
+            top: 40px;
+            left: 30px;
+            width: 500px;
+            height:20px;
+        }
+        .tax-label {
+            color: white;
+            display: inline-block;
+            float: left;
+            padding-right:10px;
+            font-family: 'Courier', sans-serif;
+        }
         .popup {
             background-color: white;
             width: 250px;
             height: 250px;
             overflow: visible;
             position: absolute;
-            right: 40%;
+            left: 250px;
             top: 150px;
             text-align: center;
+        }
+        #tax {
+            width: 80px;
         }
 
         h1 {
@@ -85,10 +102,15 @@
 <body>
 
 <div id="game-canvas">
+    <div id="tax-container">
+        <label class="tax-label">Tax Percent</label>
+        <input type="number" id="tax" value="20"/>
+    </div>
+
     <div id="popup-student-roster" class="popup hidden">
         <h1>Student Roster<span class="dismiss" onclick="dismissStudentPopup()">x</span></h1>
         <div class="list-container">
-            <h2>Double click student to add to roster</h2>
+            <h2>Click students to enroll: max enrollment 10</h2>
             <ul id="enrolled-student-list">
             </ul>
         </div>
