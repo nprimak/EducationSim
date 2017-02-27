@@ -49,8 +49,11 @@ var minimumEducatedSalary = 50000;
 var minimumNumForEducatedPerson = 12;
 var schoolPopupExists = false;
 var maintenanceFees = 0;
-var taxes = 0
+var taxes = 0;
 var prosperityBar;
+var createSchoolPopupOpen = false;
+var elapsedSeconds = 0;
+var gameOverDisplayed = false;
 
 function create() {
 
@@ -117,14 +120,14 @@ function create() {
 
     function createButtonAreas() {
         // create a new bitmap data object
-        var bmd = game.add.bitmapData(800,50);
+        var bmd = game.add.bitmapData(800,35);
 
         // draw to the canvas context like normal
         bmd.ctx.beginPath();
         bmd.ctx.rect(0,0,800,50);
         bmd.ctx.fillStyle = '#8b0000';
         bmd.ctx.fill();
-        bottomTextArea = game.add.sprite(0, 450, bmd);
+        bottomTextArea = game.add.sprite(0, game.height - 35, bmd);
         game.physics.enable(bottomTextArea, Phaser.Physics.ARCADE);
         bottomTextArea.body.immovable = true;
         // create a new bitmap data object
@@ -168,6 +171,7 @@ function increaseAge(child){
 }
 
 function monthPasses() {
+    elapsedSeconds++;
     if(clickedSchool){
         game.world.forEach(function(item) {
             item.children.forEach(function(child){
@@ -266,33 +270,36 @@ function getRandomPersonNum(){
 }
 
 function createSchool(type){
-        numOfSchools = numOfSchools + 1;
-        createSchoolButton.inputEnabled = true;
-        var school = game.add.sprite(game.world.centerX-50, game.world.centerY-50, type);
-        game.physics.arcade.enable(school);
-        school.body.immovable = true;
-        school.setScaleMinMax(.25, .25);
-        var style = {font: "20px Courier", fill: "#00ff44"};
-        var text = game.add.text(game.world.centerX -180, game.world.centerY-100, "Drag School to Desired Location", style);
-        school.body.setSize(95, 40, 0, 25);
-        school.maximumCapacity = 20;
-        school.schoolProperties = new School(type);
-        school.currentlyEnrolled = 0;
-        school.roster = [];
-        school.inputEnabled = true;
-        dismissCreatePopup();
-        school.input.enableDrag();
-        setTimeout(function () {
-            money = Math.floor(money - school.schoolProperties.buildCost);
-            maintenanceFees += Math.floor(school.schoolProperties.buildCost/4);
-            school.input.disableDrag();
-            schoolCoordinates.push([school.centerX, school.centerY]);
-            schoolsGroup.add(school);
-            schoolsGroup.inputEnableChildren = true;
-            schoolsGroup.onChildInputDown.add(onSchoolDown, this);
-            schoolsGroup.onChildInputOver.add(onSchoolOver, this);
-            text.destroy();
-        }, 5000);
+        var schoolProperties = new School(type);
+        if(schoolProperties.cost <= money) {
+            numOfSchools = numOfSchools + 1;
+            createSchoolButton.inputEnabled = true;
+            var school = game.add.sprite(game.world.centerX - 50, game.world.centerY - 50, type);
+            game.physics.arcade.enable(school);
+            school.body.immovable = true;
+            school.setScaleMinMax(.25, .25);
+            school.schoolProperties = schoolProperties;
+            var style = {font: "20px Courier", fill: "#00ff44"};
+            var text = game.add.text(game.world.centerX - 180, game.world.centerY - 100, "Drag School to Desired Location", style);
+            school.body.setSize(95, 40, 0, 25);
+            school.maximumCapacity = 20;
+            school.currentlyEnrolled = 0;
+            school.roster = [];
+            school.inputEnabled = true;
+            dismissCreatePopup();
+            school.input.enableDrag();
+            setTimeout(function () {
+                money = Math.floor(money - school.schoolProperties.buildCost);
+                maintenanceFees += Math.floor(school.schoolProperties.buildCost / 4);
+                school.input.disableDrag();
+                schoolCoordinates.push([school.centerX, school.centerY]);
+                schoolsGroup.add(school);
+                schoolsGroup.inputEnableChildren = true;
+                schoolsGroup.onChildInputDown.add(onSchoolDown, this);
+                schoolsGroup.onChildInputOver.add(onSchoolOver, this);
+                text.destroy();
+            }, 5000);
+        }
 
 
 }
@@ -352,7 +359,40 @@ function onSchoolDown(school) {
 
 function displaySchoolPopup(){
     var popupElement = document.getElementById("popup-create-school");
+    createSchoolPopupOpen = true;
+    updateButtonColors();
     popupElement.className = popupElement.className.replace('hidden', ' ');
+
+}
+
+function updateButtonColors(){
+    var popupElement = document.getElementById("popup-create-school");
+    var k12Button = document.getElementById("create-k12");
+    var privateButton = document.getElementById("create-private");
+    var tradeButton = document.getElementById("create-trade");
+    var communityButton = document.getElementById("create-community");
+    var uniButton = document.getElementById("create-uni");
+    if(money >= schoolCost){
+        k12Button.style.backgroundColor = 'darkgreen';
+        tradeButton.style.backgroundColor = 'darkgreen';
+    } else {
+        k12Button.style.backgroundColor = '#dc143c';
+        tradeButton.style.backgroundColor = '#dc143c';
+    }
+
+    if(money >= schoolCost * 2){
+        privateButton.style.backgroundColor = 'darkgreen';
+        communityButton.style.backgroundColor = 'darkgreen';
+    } else {
+        privateButton.style.backgroundColor = '#dc143c';
+        communityButton.style.backgroundColor = '#dc143c';
+    }
+
+    if(money >= schoolCost * 3){
+        uniButton.style.backgroundColor = 'darkgreen';
+    } else {
+        uniButton.style.backgroundColor = '#dc143c';
+    }
 }
 
 function updateRosterList() {
@@ -473,8 +513,37 @@ function setPersonAttributes(person, educated, education) {
 function onOver (sprite) {
     var childInfo;
     childInfo = sprite.personProps;
-    text = "Sim Stats: Education: " + childInfo.education + "| Happiness: " + childInfo.happiness + "| Employed: " +
-        childInfo.employed + "| $" + childInfo.income + "| Age: " + childInfo.age;
+    text = '';
+    text += "Sim Stats: " + childInfo.age + " years old,";
+    if(childInfo.education < minimumNumForEducatedPerson){
+        text += " Uneducated, ";
+    } else if (childInfo.education >= minimumNumForEducatedPerson && childInfo.education <= 25){
+        text += " Educated, ";
+    } else if (childInfo.education > 50){
+        text += " Very Educated, "
+    }
+
+    console.log(text);
+
+    if(childInfo.happiness <= 25){
+        text += "Unhappy, "
+    } else if( childInfo.happiness > 25 && childInfo.happiness < 50){
+        text += "Neutral, "
+    } else if(childInfo.happiness >=  50 && childInfo.happiness < 75 ){
+        text += "Happy, "
+    } else if (childInfo.happiness >= 75){
+        text += "Ecstatic, "
+    }
+    console.log(text);
+
+    if(!childInfo.employed){
+        text += " Unemployed, ";
+        if(childInfo.income > 0){
+            text += "$" + childInfo.income +" Allowance"
+        }
+    } else {
+        text += "$" + childInfo.income;
+    }
 
 }
 
@@ -503,7 +572,6 @@ function transformToEducated(_uneducated){
     setPersonAttributes(_uneducated, true, 5);
     educatedPersonsGroup.add(_uneducated);
     unEducatedPersonsGroup.remove(_uneducated);
-    console.log("transformedToEducated", _uneducated);
 }
 
 
@@ -656,13 +724,72 @@ function calculateProsperity(){
     var percentFullyEducated = numFullyEducated/numOfPeople;
     var percentFullyHappy = numFullyHappy/numOfPeople;
     var percent100Income = num100Income/numOfPeople;
-    var prosperityScore = Math.floor((percentEmployed + percentFullyEducated + percentFullyHappy + percent100Income) * 10);
+    var prosperityScore = (percentEmployed + percentFullyEducated + percentFullyHappy + percent100Income) * 10;
+    if(prosperityScore > 99.5){
+        prosperityScore = 100;
+    } else {
+        prosperityScore = Math.floor(prosperityScore);
+    }
     prosperityBar.style.width = prosperityScore + '%';
     if(prosperityScore < 10){
         prosperityBar.style.backgroundColor = '#dc143c';
     }
     return prosperityScore;
 };
+
+function playerWon(){
+    var style = {font: "30px Courier", fill: "#00ff44"};
+    var text = game.add.text(game.world.centerX - 180, game.world.centerY - 100, "You Won! :)", style);
+    displaySeconds();
+    gameOver();
+}
+
+function playerLost(reason) {
+    var style = {font: "30px Courier", fill: "#00ff44"};
+    if(reason == 'money'){
+        var text = game.add.text(game.world.centerX - 180, game.world.centerY - 100, "No more money! You Lost :(", style);
+
+    } else {
+        var text = game.add.text(game.world.centerX - 180, game.world.centerY - 100, "Zero prosperity! You Lost :(", style);
+    }
+    displaySeconds();
+    gameOver();
+}
+
+function displaySeconds(){
+    if(!gameOverDisplayed){
+        var minutes, hours, secondsRemainders, minutesRemainder;
+        if(elapsedSeconds > 60){
+            minutes = Math.floor(elapsedSeconds/60);
+            secondsRemainders = elapsedSeconds%60;
+        }
+        if(minutes > 60){
+            hours = Math.floor(minutes/60);
+            minutesRemainder = hours%60;
+        }
+        var style = {font: "20px Courier", fill: "#00ff44"};
+        if(minutes){
+            var text = game.add.text(game.world.centerX - 180, game.world.centerY - 120, "Time Elapsed: " + minutes + " minutes, " + secondsRemainders + " seconds", style);
+        }
+        else if(hours){
+            var text = game.add.text(game.world.centerX - 180, game.world.centerY - 120, "Time Elapsed: " + hours + " hours, " + minutesRemainder + " minutes, " + secondsRemainders + " seconds", style);
+        }
+        else {
+            var text = game.add.text(game.world.centerX - 180, game.world.centerY - 120, "Time Elapsed: " + elapsedSeconds + " seconds", style);
+        }
+        gameOverDisplayed = true;
+    }
+}
+
+function gameOver(){
+    game.world.forEach(function(item) {
+        item.children.forEach(function (child) {
+            child.body.velocity.set(0);
+        });
+    });
+    schoolsGroup.inputEnableChildren = false;
+
+}
 
 function update() {
     game.physics.arcade.collide(unEducatedPersonsGroup, educatedPersonsGroup, diffEducationCollissionHandler, null, this);
@@ -675,36 +802,31 @@ function update() {
     game.physics.arcade.collide(educatedPersonsGroup, topTextArea);
     game.physics.arcade.collide(unEducatedPersonsGroup, topTextArea);
 
-    if(money >= schoolCost){
-        createSchoolButton.inputEnabled = true;
-    } else {
-        createSchoolButton.inputEnabled = false;
-    }
     if(schoolPopupExists){
         educatedPersonsGroup.onChildInputDown.add(enrollStudent, this);
         unEducatedPersonsGroup.onChildInputDown.add(enrollStudent, this);
     };
+
+    var prosperityScore = calculateProsperity();
+    if(prosperityScore <= 0){
+        playerLost('prosperity');
+    }
+    if(money < 0){
+        playerLost('money');
+    }
+    if(prosperityScore >= 100 ){
+        playerWon()
+    }
 
 
 }
 
 function render() {
     var text3 = "Prosperity: " + calculateProsperity() + "%";
-    game.debug.text(text, 20, 475);
+    game.debug.text(text, 20, 487);
     game.debug.text(text2, 20, 20);
     game.debug.text(text3, 190, 20);
+    if(createSchoolPopupOpen){
+        updateButtonColors();
+    }
 }
-
-// function move() {
-//     var random = Math.floor(getRandom(1, 4));
-//     if(random == 1){
-//         personsGroup.body.moveTo(gridScale, gridScale, Phaser.ANGLE_RIGHT);
-//     }
-//     if(random == 2){
-//         personsGroup.body.moveTo(gridScale, gridScale, Phaser.ANGLE_LEFT);
-//     }
-//     if(random == 3){
-//         personsGroup.body.moveTo(gridScale, gridScale, Phaser.ANGLE_UP);
-//     }
-//
-// }

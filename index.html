@@ -3,22 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <title>Education Game</title>
+    <link href="https://fonts.googleapis.com/css?family=VT323" rel="stylesheet">
     <script src="javascript/phaser.min.js"></script>
     <script src="javascript/game.js"></script>
     <style>
+        body{
+            background-color: darkgreen;
+            background-repeat: repeat;
+            background-position: right top;
+            background-size: 150px 150px;
+            background-attachment: fixed;
+        }
+        .nav-container {
+            width: 800px;
+            background-color: #8B0000;
+            margin: 0 auto;
+            position: relative;
+            text-align: center;
+            color: white;
+            padding-bottom:10px;
+            height: 40px;
+
+
+        }
+        .title{
+            font-size: 35px;
+            float: left;
+            padding-top: 10px;
+            padding-left: 20px;
+            font-family: 'VT323', monospace;
+            text-transform: uppercase;
+            height: 0px;
+            letter-spacing: 2px;
+        }
+        .nav-url {
+            float: right;
+            margin-top: -15px;
+            font-family: sans-serif;
+            height: 50px;
+            position: relative;
+        }
+        .container {
+            width: 100%;
+            position: relative;
+            height: 100%;
+        }
+        #game-canvas {
+            z-index: 1;
+            margin: 0 auto;
+            width: 800px;
+            height: 500px;
+            display: block;
+            position: relative;
+            border: 1px solid black;
+        }
         #tax-container {
-            position:absolute;
-            top: 40px;
-            left: 30px;
             width: 500px;
+            position:absolute;
+            display: block;
             height:20px;
+            top:35px;
+            left:20px;
+            z-index: 2;
         }
         .tax-label {
             color: white;
             display: inline-block;
             float: left;
             padding-right:10px;
-            font-family: 'Courier', sans-serif;
+            font-family: 'VT323', monospace;
         }
         .popup {
             background-color: white;
@@ -34,14 +87,15 @@
             width: 40px;
         }
         #prosperity-bar {
+            position:absolute;
+            top:35px;
+            left: 190px;
+            display:block;
             width:200px;
             background-color: black;
             border: 1px solid darkgreen;
-            position: absolute;
-            display:block;
+            z-index: 2;
             height: 20px;
-            top:40px;
-            left: 200px;
         }
         #prosperity-bar-filler {
             background-color: lawngreen;
@@ -52,11 +106,12 @@
             border: 1px solid darkgreen;
             width: 238px;
             height: 43px;
-            font-size: 20px;
+            font-size: 25px;
             line-height: 40px;
             font-family: sans-serif;
             margin-top: -30px;
             text-align: left;
+            font-family: 'VT323', monospace;
             background-color: #8b0000;
             color: white;
             padding-left: 15px;
@@ -89,68 +144,135 @@
             color: black;
             height: 225px;
             overflow-y: scroll;
-            margin-top: -13px;
+            margin-top: -17px;
             padding-top: 10px;
+        }
+
+        .ul-nav-url {
+            list-style-type: none;
+        }
+
+        .li-nav-url {
+            height: 40px;
+            width:100px;
+            background-color: #8B0000;
+            margin:0 auto;
+            font-family: 'VT323', monospace;
+            color: black;
+            font-size: 25px;
+            border-left: 1px solid black;
+            border-right: 1px solid black;
+            line-height:40px;
+            text-align: center;
+        }
+
+        .li-nav-url:hover {
+            background-color: limegreen;
+            cursor: pointer;
         }
 
         h2 {
             margin-top: -5px;
             text-align: center;
-            font-size: 15px;
-            font-family: sans-serif;
+            font-size: 20px;
+            font-family: 'VT323', monospace;
             padding-left:10px;
             padding-right:10px;
         }
         li{
             padding-bottom:10px;
-            margin-left: -20px;
+            margin-left: -30px;
+            float: left;
+            font-size: 12px;
+            font-family: 'Courier', monospace;
+            font-weight: 600;
 
         }
 
         button {
-            margin-bottom:10px;
+            margin-bottom:30px;
+            margin-top: 10px;
+            color: white;
+            padding: 5px;
+            font-size:20px;
+            padding-left:20px;
+            padding-right: 20px;
+            font-family: 'VT323', monospace;
+            border: none;
 
+        }
+        p {
+            margin-bottom: 5px;
+            text-align: left;
+            font-size: 12px;
+            padding-left: 10px;
+            font-weight: 600;
+            margin-top: 5px;
+            line-height:12px;
+            font-family: 'Courier', monospace;
         }
     </style>
 </head>
 <body>
-
-<div id="game-canvas">
-
-    <div id="prosperity-bar">
-        <div id="prosperity-bar-filler"></div>
-    </div>
-
-    <div id="tax-container">
-        <label class="tax-label">Tax
-        <input type="number" id="tax" value="20"/>&nbsp;%</label>
-    </div>
-
-    <div id="popup-student-roster" class="popup hidden">
-        <h1>Student Roster<span class="dismiss" onclick="dismissStudentPopup()">x</span></h1>
-        <div class="list-container">
-            <h2>Click students to enroll: max enrollment 10</h2>
-            <ul id="enrolled-student-list">
+<div class="container">
+    <div class="nav-container">
+        <h2 class="title">Education Sim</h2>
+        <nav class="nav-url">
+            <ul class="ul-nav-url">
+                <li class="li-nav-url">Rules</li>
+                <li class="li-nav-url">About</li>
             </ul>
+        </nav>
+    </div>
+    <div id="game-canvas">
+
+        <div id="prosperity-bar">
+            <div id="prosperity-bar-filler"></div>
+        </div>
+
+        <div id="tax-container">
+            <label class="tax-label">Tax
+                <input type="number" id="tax" value="20"/>&nbsp;%</label>
+        </div>
+
+        <div id="popup-student-roster" class="popup hidden">
+            <h1>Student Roster<span class="dismiss" onclick="dismissStudentPopup()">x</span></h1>
+            <div class="list-container">
+                <h2>Click students to enroll: max enrollment 10</h2>
+                <ul id="enrolled-student-list">
+                </ul>
+            </div>
+        </div>
+
+        <div id="popup-create-school" class="popup hidden">
+            <h1>Create School<span class="dismiss" onclick="dismissCreatePopup()">x</span></h1>
+            <div class="list-container">
+                <h2>Public K-12</h2>
+                <p>Cost: $500,000</p>
+                <p>Maintenance: $125,000 /month</p>
+                <button id="create-k12" onclick="createSchool('k12')">CREATE</button>
+                <h2>Private K-12</h2>
+                <p>Cost: $1,000,000</p>
+                <p>Maintenance: $250,000 /month</p>
+                <button id="create-private" onclick="createSchool('privatek12')">CREATE</button>
+                <h2>Trade School</h2>
+                <p>Cost: 500,000</p>
+                <p>Maintenance: $125,000 /month</p>
+                <button id="create-trade" onclick="createSchool('trade')">CREATE</button>
+                <h2>Community College</h2>
+                <p>Cost: $1,000,000</p>
+                <p>Maintenance: $250,000 /month</p>
+                <button id="create-community" onclick="createSchool('community')">CREATE</button>
+                <h2>University</h2>
+                <p>Cost: $1,500,000</p>
+                <p>Maintenance: $375,000 /month</p>
+                <button id="create-uni" onclick="createSchool('uni')">CREATE</button>
+            </div>
         </div>
     </div>
 
-    <div id="popup-create-school" class="popup hidden">
-        <h1>Create School<span class="dismiss" onclick="dismissCreatePopup()">x</span></h1>
-        <div class="list-container">
-            <h2>Public K-12</h2>
-            <button onclick="createSchool('k12')">CREATE</button>
-            <h2>Private K-12</h2>
-            <button onclick="createSchool('privatek12')">CREATE</button>
-            <h2>Trade School</h2>
-            <button onclick="createSchool('trade')">CREATE</button>
-            <h2>Community College</h2>
-            <button onclick="createSchool('community')">CREATE</button>
-            <h2>University</h2>
-            <button onclick="createSchool('uni')">CREATE</button>
-        </div>
-    </div>
 </div>
+
 
 
 
