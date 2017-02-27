@@ -24,7 +24,7 @@
       <file leaf-file-name="index.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/index.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3804">
+            <state relative-caret-position="8349">
               <caret line="267" column="42" lean-forward="false" selection-start-line="267" selection-start-column="42" selection-end-line="267" selection-end-column="42" />
               <folding>
                 <element signature="e#6189#6195#0" expanded="true" />
@@ -60,8 +60,8 @@
       <file leaf-file-name="game.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/javascript/game.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-213">
-              <caret line="728" column="30" lean-forward="true" selection-start-line="728" selection-start-column="30" selection-end-line="728" selection-end-column="30" />
+            <state relative-caret-position="348">
+              <caret line="254" column="23" lean-forward="true" selection-start-line="254" selection-start-column="23" selection-end-line="254" selection-end-column="23" />
               <folding />
             </state>
           </provider>
@@ -79,10 +79,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>drag</find>
-      <find>dismi</find>
-      <find>popup</find>
-      <find>canEnroll</find>
       <find>tint</find>
       <find>enroll</find>
       <find>maxEd</find>
@@ -106,9 +102,13 @@
       <find>border</find>
       <find>Person</find>
       <find>gameOver</find>
-      <find>list-contain</find>
       <find>prosperity</find>
       <find>calculate</find>
+      <find>display</find>
+      <find>updatemoney</find>
+      <find>list-contain</find>
+      <find>adjust</find>
+      <find>taxes</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -240,12 +240,12 @@
       <workItem from="1487640508266" duration="37862000" />
       <workItem from="1487775151222" duration="41233000" />
       <workItem from="1487955436383" duration="23426000" />
-      <workItem from="1488054650683" duration="46097000" />
+      <workItem from="1488054650683" duration="48940000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="149476000" />
+    <option name="totallyTimeSpent" value="152319000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1" y="1" width="2558" height="1358" extended-state="0" />
@@ -436,7 +436,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3804">
+        <state relative-caret-position="8349">
           <caret line="267" column="42" lean-forward="false" selection-start-line="267" selection-start-column="42" selection-end-line="267" selection-end-column="42" />
           <folding>
             <element signature="e#6189#6195#0" expanded="true" />
@@ -446,8 +446,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/javascript/game.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-213">
-          <caret line="728" column="30" lean-forward="true" selection-start-line="728" selection-start-column="30" selection-end-line="728" selection-end-column="30" />
+        <state relative-caret-position="348">
+          <caret line="254" column="23" lean-forward="true" selection-start-line="254" selection-start-column="23" selection-end-line="254" selection-end-column="23" />
           <folding />
         </state>
       </provider>

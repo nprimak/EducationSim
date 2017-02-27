@@ -49,7 +49,7 @@ var minimumEducatedSalary = 50000;
 var minimumNumForEducatedPerson = 12;
 var schoolPopupExists = false;
 var maintenanceFees = 0;
-var taxes = 0;
+var taxes = 20;
 var prosperityBar;
 var createSchoolPopupOpen = false;
 var elapsedSeconds = 0;
@@ -189,7 +189,8 @@ function monthPasses() {
             });
         });
     }
-    updateMoney()
+        updateMoney();
+
 }
 
 function yearPasses() {
@@ -229,11 +230,17 @@ function giveLargePromotion(child) {
 }
 
 function updateMoney(){
-    taxes = document.getElementById('tax').value * .01;
+    taxes = document.getElementById('tax').value;
+    if(taxes > 100 || taxes < 0){
+        document.getElementById('tax').value = 20;
+        taxes = 20;
+    }
+    var taxPercent= taxes * .01;
+
     game.world.forEach(function(item) {
         item.children.forEach(function(child){
             if(child.personProps){
-                money += Math.floor(child.personProps.income * taxes);
+                money += Math.floor(child.personProps.income * taxPercent);
             }
         });
     });
@@ -243,6 +250,13 @@ function updateMoney(){
 }
 
 function adjustHappiness(child){
+    if(taxes > 30){
+        child.personProps.happiness--;
+        if(taxes > 50){
+            var happinessSubMultiplier = 51-taxes;
+            child.personProps.happiness = child.personProps.happiness - happinessSubMultiplier;
+        }
+    }
     if(child.type == 'educated'){
         if(unEducatedPersonsGroup.length > (educatedPersonsGroup.length * 5)){
             child.personProps.happiness--;
@@ -358,10 +372,12 @@ function onSchoolDown(school) {
 }
 
 function displaySchoolPopup(){
-    var popupElement = document.getElementById("popup-create-school");
-    createSchoolPopupOpen = true;
-    updateButtonColors();
-    popupElement.className = popupElement.className.replace('hidden', ' ');
+    if(!gameOverDisplayed){
+        var popupElement = document.getElementById("popup-create-school");
+        createSchoolPopupOpen = true;
+        updateButtonColors();
+        popupElement.className = popupElement.className.replace('hidden', ' ');
+    }
 
 }
 
@@ -765,7 +781,7 @@ function displaySeconds(){
         }
         if(minutes > 60){
             hours = Math.floor(minutes/60);
-            minutesRemainder = hours%60;
+            minutesRemainder = (minutes/60)%60;
         }
         var style = {font: "20px Courier", fill: "#00ff44"};
         if(minutes){
@@ -801,7 +817,6 @@ function update() {
     game.physics.arcade.collide(unEducatedPersonsGroup, bottomTextArea);
     game.physics.arcade.collide(educatedPersonsGroup, topTextArea);
     game.physics.arcade.collide(unEducatedPersonsGroup, topTextArea);
-
     if(schoolPopupExists){
         educatedPersonsGroup.onChildInputDown.add(enrollStudent, this);
         unEducatedPersonsGroup.onChildInputDown.add(enrollStudent, this);
