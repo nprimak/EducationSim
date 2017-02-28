@@ -60,8 +60,8 @@
       <file leaf-file-name="game.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/javascript/game.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="348">
-              <caret line="254" column="23" lean-forward="true" selection-start-line="254" selection-start-column="23" selection-end-line="254" selection-end-column="23" />
+            <state relative-caret-position="381">
+              <caret line="524" column="34" lean-forward="false" selection-start-line="524" selection-start-column="34" selection-end-line="524" selection-end-column="34" />
               <folding />
             </state>
           </provider>
@@ -79,7 +79,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>tint</find>
       <find>enroll</find>
       <find>maxEd</find>
       <find>education</find>
@@ -109,6 +108,7 @@
       <find>list-contain</find>
       <find>adjust</find>
       <find>taxes</find>
+      <find>getRandomPersonNum</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -240,12 +240,12 @@
       <workItem from="1487640508266" duration="37862000" />
       <workItem from="1487775151222" duration="41233000" />
       <workItem from="1487955436383" duration="23426000" />
-      <workItem from="1488054650683" duration="48940000" />
+      <workItem from="1488054650683" duration="50400000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="152319000" />
+    <option name="totallyTimeSpent" value="153779000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1" y="1" width="2558" height="1358" extended-state="0" />
@@ -446,8 +446,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/javascript/game.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="348">
-          <caret line="254" column="23" lean-forward="true" selection-start-line="254" selection-start-column="23" selection-end-line="254" selection-end-column="23" />
+        <state relative-caret-position="381">
+          <caret line="524" column="34" lean-forward="false" selection-start-line="524" selection-start-column="34" selection-end-line="524" selection-end-column="34" />
           <folding />
         </state>
       </provider>

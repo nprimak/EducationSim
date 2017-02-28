@@ -14,17 +14,29 @@ function preload() {
     game.load.spritesheet('privatek12', 'sprites/privateschool.png', 385, 239);
     game.load.spritesheet('trade', 'sprites/tradeschool.png', 385, 239);
     game.load.spritesheet('uni', 'sprites/university.png', 385, 239);
-    game.load.spritesheet('person0', 'sprites/person_0.png', 60, 130);
-    game.load.spritesheet('person1', 'sprites/person_1.png', 60, 130);
-    game.load.spritesheet('person2', 'sprites/person_2.png', 60, 130);
-    game.load.spritesheet('person3', 'sprites/person_3.png', 60, 130);
-    game.load.spritesheet('person4', 'sprites/person_4.png', 60, 130);
-    game.load.spritesheet('person5', 'sprites/person_5.png', 60, 130);
-    game.load.spritesheet('person6', 'sprites/person_6.png', 60, 130);
-    game.load.spritesheet('person7', 'sprites/person_7.png', 60, 130);
-    game.load.spritesheet('person8', 'sprites/person_8.png', 60, 130);
-    game.load.spritesheet('person9', 'sprites/person_9.png', 60, 130);
-
+    game.load.spritesheet('person0', 'sprites/person_1.png', 88, 205);
+    game.load.spritesheet('person1', 'sprites/person_2.png', 88, 205);
+    game.load.spritesheet('person2', 'sprites/person_3.png', 88, 205);
+    game.load.spritesheet('person3', 'sprites/person_4.png', 88, 205);
+    game.load.spritesheet('person4', 'sprites/person_5.png', 88, 205);
+    game.load.spritesheet('person5', 'sprites/person_6.png', 88, 205);
+    game.load.spritesheet('person6', 'sprites/person_7.png', 88, 205);
+    game.load.spritesheet('person7', 'sprites/person_8.png', 88, 205);
+    game.load.spritesheet('person8', 'sprites/person_9.png', 88, 205);
+    game.load.spritesheet('person9', 'sprites/person_10.png', 88, 205);
+    game.load.spritesheet('person10', 'sprites/person_11.png', 88, 205);
+    game.load.spritesheet('person11', 'sprites/person_12.png', 88, 205);
+    game.load.spritesheet('person12', 'sprites/person_13.png', 88, 205);
+    game.load.spritesheet('person13', 'sprites/person_14.png', 88, 205);
+    game.load.spritesheet('person14', 'sprites/person_15.png', 88, 205);
+    game.load.spritesheet('person15', 'sprites/person_16.png', 88, 205);
+    game.load.spritesheet('person16', 'sprites/person_17.png', 88, 205);
+    game.load.spritesheet('person17', 'sprites/person_18.png', 88, 205);
+    game.load.spritesheet('person18', 'sprites/person_19.png', 88, 205);
+    game.load.spritesheet('person19', 'sprites/person_20.png', 88, 205);
+    game.load.spritesheet('person20', 'sprites/person_21.png', 88, 205);
+    game.load.spritesheet('person21', 'sprites/person_22.png', 88, 205);
+    game.load.spritesheet('person22', 'sprites/person_23.png', 88, 205);
 }
 
 
@@ -280,7 +292,7 @@ function adjustHappiness(child){
 }
 
 function getRandomPersonNum(){
-    return Math.floor(getRandom(0,10));
+    return Math.floor(getRandom(0,22));
 }
 
 function createSchool(type){
@@ -510,7 +522,7 @@ function enrolledSchool(maxEducation, quality){
 }
 
 function setPersonAttributes(person, educated, education) {
-    person.setScaleMinMax(.2, .2);
+    person.setScaleMinMax(.15, .15);
     person.body.setSize(13, 30, 0, 0);
     person.body.collideWorldBounds = true;
     person.body.bounce.x = 1;
