@@ -71,7 +71,7 @@ function create() {
 
     game.stage.backgroundColor = '#397152';
     text = "Hover over a person to see their stats";
-    text2 = "$: ";
+    text2 = "$0";
 
     // Person generation
     var numOfEducatedPersons = 10;
@@ -349,7 +349,7 @@ function School(type) {
     }
     if(type == 'uni'){
         this.cost = 50000;
-        this.ageRange = [18,40];
+        this.ageRange = [18,80];
         this.quality = 3;
         this.maxEducation = 21 * this.quality;
         this.minEducation = 18;
@@ -357,7 +357,7 @@ function School(type) {
     }
     if(type == 'trade'){
         this.cost = 1000;
-        this.ageRange = [18,80];
+        this.ageRange = [18,60];
         this.quality = 1;
         this.maxEducation = 18 * this.quality;
         this.minEducation = 0;
@@ -365,10 +365,10 @@ function School(type) {
     }
     if(type == 'community'){
         this.cost = 10000;
-        this.ageRange = [18,80];
+        this.ageRange = [18,70];
         this.quality = 2;
         this.maxEducation = 21 * this.quality;
-        this.minEducation = 0;
+        this.minEducation = 18;
         this.buildCost = schoolCost * this.quality;
     }
 }
@@ -431,7 +431,7 @@ function updateRosterList() {
     var node;
     for(var i = 0; i < clickedSchool.roster.length; i++){
         node = document.createElement("LI");
-        var textnode = document.createTextNode("Student #" + i + " Education Level: " + clickedSchool.roster[i].personProps.education.toString());
+        var textnode = document.createTextNode("Student #" + (i+1) + " Education Level: " + clickedSchool.roster[i].personProps.education.toString());
         node.appendChild(textnode);
         listParent.appendChild(node);
     }
@@ -500,6 +500,33 @@ function dismissCreatePopup(){
 
 }
 
+function displayGame() {
+    var playOverlay = document.getElementById("play");
+    var gameCanvas = document.getElementById("game-canvas");
+    var aboutOverlay = document.getElementById("about");
+    playOverlay.style.display = "none";
+    aboutOverlay.style.display = "none";
+    gameCanvas.style.display = "block";
+}
+
+function displayPlayOverlay() {
+    var playOverlay = document.getElementById("play");
+    var aboutOverlay = document.getElementById("about");
+    var gameCanvas = document.getElementById("game-canvas");
+    playOverlay.style.display = "block";
+    aboutOverlay.style.display = "none";
+    gameCanvas.style.display = "none";
+}
+
+function displayAboutOverlay() {
+    var playOverlay = document.getElementById("play");
+    var aboutOverlay = document.getElementById("about");
+    var gameCanvas = document.getElementById("game-canvas");
+    playOverlay.style.display = "none";
+    aboutOverlay.style.display = "block";
+    gameCanvas.style.display = "none";
+}
+
 function onSchoolOver(school){
     if(school.maximumCapacity == school.currentlyEnrolled){
         text = "School is at maximum capacity, currently " + school.currentlyEnrolled + " students enrolled.";
@@ -551,8 +578,6 @@ function onOver (sprite) {
         text += " Very Educated, "
     }
 
-    console.log(text);
-
     if(childInfo.happiness <= 25){
         text += "Unhappy, "
     } else if( childInfo.happiness > 25 && childInfo.happiness < 50){
@@ -562,7 +587,6 @@ function onOver (sprite) {
     } else if (childInfo.happiness >= 75){
         text += "Ecstatic, "
     }
-    console.log(text);
 
     if(!childInfo.employed){
         text += " Unemployed, ";
@@ -755,9 +779,12 @@ function calculateProsperity(){
     var prosperityScore = (percentEmployed + percentFullyEducated + percentFullyHappy + percent100Income) * 10;
     if(prosperityScore > 99.5){
         prosperityScore = 100;
-    } else {
-        prosperityScore = Math.floor(prosperityScore);
     }
+    if(prosperityScore <= 0 ){
+        prosperityScore = 0;
+    }
+    prosperityScore = Math.floor(prosperityScore);
+
     prosperityBar.style.width = prosperityScore + '%';
     if(prosperityScore < 10){
         prosperityBar.style.backgroundColor = '#dc143c';

@@ -23,8 +23,47 @@
             color: white;
             padding-bottom:10px;
             height: 40px;
-
-
+        }
+        .title:hover{
+            cursor:pointer;
+        }
+        .overlay {
+            z-index: 1;
+            margin: 0 auto;
+            width: 800px;
+            height: 500px;
+            display: none;
+            position: relative;
+            background-color: white;
+            overflow-y: scroll;
+            overflow-x: hidden;
+        }
+        .overlay p {
+            font-size:18px;
+            padding-bottom:15px;
+            padding-left:20px;
+            padding-right:15px;
+            line-height:20px;
+        }
+        .overlay h1{
+            background-color: white;
+            color: black;
+            margin: 0px;
+            padding-top:10px;
+            padding-left:20px;
+            border: none;
+            width: 100%;
+            font-size:40px;
+        }
+        .overlay a{
+            font-family: 'VT323', monospace;
+            font-size:25px;
+            color: red;
+            padding-left:20px;
+            text-decoration: none;
+        }
+        .overlay a:hover {
+            color: #8B0000;
         }
         .title{
             font-size: 35px;
@@ -154,7 +193,7 @@
 
         .li-nav-url {
             height: 40px;
-            width:100px;
+            width:120px;
             background-color: #8B0000;
             margin:0 auto;
             font-family: 'VT323', monospace;
@@ -216,14 +255,39 @@
 <body>
 <div class="container">
     <div class="nav-container">
-        <h2 class="title">Education Sim</h2>
+        <h2 class="title" onclick="displayGame()">Education Sim</h2>
         <nav class="nav-url">
             <ul class="ul-nav-url">
-                <li class="li-nav-url">Rules</li>
-                <li class="li-nav-url">About</li>
+                <li class="li-nav-url" onclick="displayPlayOverlay()">How to Play</li>
+                <li class="li-nav-url" onclick="displayAboutOverlay()">About</li>
             </ul>
         </nav>
     </div>
+    <div class="overlay" id="play">
+        <h1>How to Play</h1>
+        <p>Education Sim is about creating a prosperous community through educating your citizens with schools.</p>
+        <p>Your prosperity is calculated with 4 criteria in mind: citizen happiness, level of education, income, and the
+            percentage of your citizens that are employed. You win when your prosperity reaches 100%. Sounds simple enough?
+            Well, it's harder to achieve than you might thing. </p>
+        <p>Unfortunately, your community does not start out very prosperous. You have no schools, and the majority of your citizens are uneducated.
+            Also, your uneducated population procreates at a faster pace, so you have to constantly educate new citizens. To make matters even worse, your educated citizens
+            will leave the city if the uneducated population becomes too high.</p>
+        <p>However, not all hope is lost. You have the ability to tax your citizens and receive a constant stream of income with which to build schools and keep
+            your population educated. The more educated your citizens become, the more likely they will become employed and lead happier lives, contributing to a
+            higher prosperity score as well as higher income for your community.</p>
+        <p>You must be strategic when you choose which schools to build. Not all of them cost the same amount, and not all of them will admit any citizen. The more expensive
+            the school is to build, the more it costs to attend. And the more maintenance fees will sap at your income.</p>
+        <p>There are two ways in which you can lose the game. First, if your prosperity drops to 0% , and second if your money drops below $0. Remember, you can increase taxes if you notice
+            your money decreasing. Keep a close eye on your prosperity and $ displays.</p>
+        <h1>Thanks for playing, and have fun!</h1>
+    </div>
+
+    <div class="overlay" id="about">
+        <h1>About</h1>
+        <p>This game was designed and programmed with tender love and care (as well as plenty of swear) by Nadya Primak using the Phaser game engine.</p>
+        <a href="http://www.nadyaprimak.com">Check out her website</a>
+    </div>
+
     <div id="game-canvas">
 
         <div id="prosperity-bar">
@@ -238,7 +302,7 @@
         <div id="popup-student-roster" class="popup hidden">
             <h1>Student Roster<span class="dismiss" onclick="dismissStudentPopup()">x</span></h1>
             <div class="list-container">
-                <h2>Click students to enroll: max enrollment 10</h2>
+                <h2>Click students to enroll: max enrollment 20</h2>
                 <ul id="enrolled-student-list">
                 </ul>
             </div>
@@ -248,23 +312,38 @@
             <h1>Create School<span class="dismiss" onclick="dismissCreatePopup()">x</span></h1>
             <div class="list-container">
                 <h2>Public K-12</h2>
-                <p>Cost: $500,000</p>
+                <p>Age Range: 6 - 18</p>
+                <p>Cost to Attend: Free</p>
+                <p>Min Education Needed: None</p>
+                <p>Cost to Build: $500,000</p>
                 <p>Maintenance: $125,000 /month</p>
                 <button id="create-k12" onclick="createSchool('k12')">CREATE</button>
                 <h2>Private K-12</h2>
-                <p>Cost: $1,000,000</p>
+                <p>Age Range: 6 - 18</p>
+                <p>Cost to Attend: $5,000</p>
+                <p>Min Education Needed: None</p>
+                <p>Cost to Build: $1,000,000</p>
                 <p>Maintenance: $250,000 /month</p>
                 <button id="create-private" onclick="createSchool('privatek12')">CREATE</button>
                 <h2>Trade School</h2>
-                <p>Cost: 500,000</p>
+                <p>Age Range: 18 - 60</p>
+                <p>Cost to Attend: $1,000</p>
+                <p>Min Education Needed: None</p>
+                <p>Cost to Build: 500,000</p>
                 <p>Maintenance: $125,000 /month</p>
                 <button id="create-trade" onclick="createSchool('trade')">CREATE</button>
                 <h2>Community College</h2>
-                <p>Cost: $1,000,000</p>
+                <p>Age Range: 18 - 70</p>
+                <p>Cost to Attend: $10,000</p>
+                <p>Min Education Needed: K-12</p>
+                <p>Cost to Build: $1,000,000</p>
                 <p>Maintenance: $250,000 /month</p>
                 <button id="create-community" onclick="createSchool('community')">CREATE</button>
                 <h2>University</h2>
-                <p>Cost: $1,500,000</p>
+                <p>Age Range: 18 - 80</p>
+                <p>Cost to Attend: $50,000</p>
+                <p>Min Education Needed: K-12</p>
+                <p>Cost to Build: $1,500,000</p>
                 <p>Maintenance: $375,000 /month</p>
                 <button id="create-uni" onclick="createSchool('uni')">CREATE</button>
             </div>
