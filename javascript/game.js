@@ -91,8 +91,8 @@ function create() {
     createUneducatedPersons(unEducatedPersonsGroup, numOfUnEducatedPersons);
     game.time.events.loop(Phaser.Timer.SECOND*12, yearPasses, this);
     game.time.events.loop(Phaser.Timer.SECOND, monthPasses, this);
-    createSchoolButton = game.add.button(game.world.width - (game.world.centerX/2.7), 8, 'button', displaySchoolPopup, this, .5, .5, 0);
-    createSchoolButton.setScaleMinMax(.5, .5);
+    createSchoolButton = game.add.button(game.world.width - (game.world.centerX/2.35), 4, 'button', displaySchoolPopup, this, .5, .5, 0);
+    createSchoolButton.setScaleMinMax(.6, .6);
 
     function createUneducatedPersons(unEducatedPersonsGroup,numOfUnEducatedPersons){
         for(var i=0; i<= numOfUnEducatedPersons; i++){
@@ -692,7 +692,6 @@ function proCreate(sprite1, sprite2, different, educated) {
                 person = unEducatedPersonsGroup.create(sprite1.position.x, sprite2.position.y, 'person' + randomPersonNum);
                 setPersonAttributes(person, false, education);
                 person.personProps = new Person(education, happiness, employed, income, age, enrolled);
-                console.log("new child of EDUCATED person created?");
             }
         } else {
             if(unEducatedWillProCreate(sprite1, sprite2)){
@@ -709,7 +708,6 @@ function proCreate(sprite1, sprite2, different, educated) {
                 person = unEducatedPersonsGroup.create(sprite1.position.x, sprite2.position.y, 'person' + randomPersonNum);
                 setPersonAttributes(person, false, education);
                 person.personProps = new Person(education, happiness, employed, income, age, enrolled);
-                console.log("new child of UNEDUCATED person created?");
             }
         }
         canProCreate = false;
